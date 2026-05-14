@@ -11,10 +11,10 @@ SFTP_HOST=bmk.8e2.myftpupload.com
 SFTP_PORT=22
 SFTP_USER=<GoDaddy generated username>
 SFTP_PASSWORD=<GoDaddy generated password>
-SFTP_REMOTE_PATH=/dev
+SFTP_REMOTE_PATH=dev
 ```
 
-Use `SFTP_REMOTE_PATH=/html/dev` instead if GoDaddy's SFTP file browser shows an `html` folder first.
+Use `SFTP_REMOTE_PATH=html/dev` instead if GoDaddy's SFTP file browser shows an `html` folder first.
 
 ## Deploy scope
 
