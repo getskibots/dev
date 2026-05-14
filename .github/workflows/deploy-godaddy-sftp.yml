@@ -36,7 +36,8 @@ jobs:
 
           lftp -u "$SFTP_USER","$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" <<EOF
           set sftp:auto-confirm yes
-          mirror --reverse --verbose --only-newer \
+          mkdir -p "$SFTP_REMOTE_PATH"
+          mirror --reverse --verbose --only-newer --no-perms \
             --exclude-glob ".git/**" \
             --exclude-glob ".github/**" \
             --exclude-glob ".gitignore" \
