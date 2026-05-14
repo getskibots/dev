@@ -1,0 +1,49 @@
+name: Deploy to GoDaddy dev site
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Upload prototype files over SFTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install SFTP client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Deploy prototype folder
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_REMOTE_PATH: ${{ secrets.SFTP_REMOTE_PATH }}
+        run: |
+          : "${SFTP_HOST:?Missing SFTP_HOST secret}"
+          : "${SFTP_PORT:?Missing SFTP_PORT secret}"
+          : "${SFTP_USER:?Missing SFTP_USER secret}"
+          : "${SFTP_PASSWORD:?Missing SFTP_PASSWORD secret}"
+          : "${SFTP_REMOTE_PATH:?Missing SFTP_REMOTE_PATH secret}"
+
+          lftp -u "$SFTP_USER","$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_HOST" <<EOF
+          set sftp:auto-confirm yes
+          mirror --reverse --verbose --only-newer \
+            --exclude-glob ".git/**" \
+            --exclude-glob ".github/**" \
+            --exclude-glob ".gitignore" \
+            --exclude-glob "README.md" \
+            --exclude-glob "node_modules/**" \
+            --exclude-glob ".env" \
+            --exclude-glob "*.log" \
+            ./ "$SFTP_REMOTE_PATH"
+          bye
+          EOF
